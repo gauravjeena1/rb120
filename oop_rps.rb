@@ -53,7 +53,6 @@ class Human < Player
 end
 
 class Computer < Player
-  
   def possible_moves(name)
     case name
     when 'Claude'
@@ -64,13 +63,13 @@ class Computer < Player
       ['rock', 'paper', 'scissors', 'lizard', 'spock']
     end
   end
-  
+
   def set_name
     self.name = ['Claude', "GPT", "Codi"].sample
   end
 
   def choose
-    self.move = Move.new(possible_moves(self.name).sample)
+    self.move = Move.new(possible_moves(name).sample)
     all_moves << move.choice
   end
 
