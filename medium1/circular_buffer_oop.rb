@@ -9,12 +9,12 @@ class CircularBuffer
     @buffer.pop
   end
 
-  def check_array_size
+  def array_size_max?
     @buffer.size >= @max_size
   end
 
   def put(num)
-    get if check_array_size
+    get if array_size_max?
 
     # @buffer.unshift(num)    #performance wise using unshift or creating a new array are same
     @buffer = [num] + @buffer
