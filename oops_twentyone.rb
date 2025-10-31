@@ -1,14 +1,14 @@
 module Hand
   def busted?
-    self.total > 21
+    total > 21
   end
 
   def total
-    total_sum = self.cards.sum { |card| Card::CARD_VALUES[card] }
+    total_sum = cards.sum { |card| Card::CARD_VALUES[card] }
 
     if ace_count >= 1
       ace_count.times do |_|
-        break if total_sum <= 21  
+        break if total_sum <= 21
         total_sum -= 10
       end
     end
@@ -16,12 +16,13 @@ module Hand
   end
 
   def ace_count
-    self.cards.count(:ace)
+    cards.count(:ace)
   end
 end
 
 class Player
   include Hand
+
   attr_accessor :cards
   attr_reader :name
 
@@ -33,6 +34,7 @@ end
 
 class Dealer
   include Hand
+
   attr_accessor :cards
 
   def initialize
@@ -42,11 +44,12 @@ end
 
 class Deck
   attr_accessor :deck
+
   def initialize
     @deck = {
-              ace: 4, two: 4, three: 4, four: 4, five: 4, six: 4, seven: 4, 
-              eight: 4, nine: 4, ten: 4, jack: 4, queen: 4,king: 4 
-            }
+      ace: 4, two: 4, three: 4, four: 4, five: 4, six: 4, seven: 4,
+      eight: 4, nine: 4, ten: 4, jack: 4, queen: 4, king: 4
+    }
   end
 
   def update_deck(card)
@@ -66,21 +69,16 @@ class Deck
     update_deck(card)
     card
   end
-
 end
 
 class Card
-    CARD_VALUES = {
-                  ace: 11, two: 2, three: 3, four: 4, five: 5, six: 6,
-                  seven: 7, eight: 8, nine: 9, ten: 10, jack: 10, queen: 10, king: 10
-                }
+  CARD_VALUES = {
+    ace: 11, two: 2, three: 3, four: 4, five: 5, six: 6,
+    seven: 7, eight: 8, nine: 9, ten: 10, jack: 10, queen: 10, king: 10
+  }
 
   def initialize
     @value = card_value?
-  end
-
-  def ace_value?(total)
-    (total + 10 > 21) ? 1 : 10
   end
 
   def card_value?(card)
@@ -95,8 +93,7 @@ class Game
     @dealer = Dealer.new
   end
 
-  attr_accessor :player, :dealer
-  attr_accessor :deck
+  attr_accessor :player, :dealer, :deck
 
   def start
     deal_cards
@@ -145,7 +142,7 @@ class Game
   end
 
   def show_initial_cards
-    puts "#{player.name} got: #{player.cards.join(" and ")}"
+    puts "#{player.name} got: #{player.cards.join(' and  ')}"
     puts "Dealer got: #{dealer.cards.first}"
     puts "--------------------------"
   end
@@ -175,13 +172,10 @@ class Game
     puts "Now dealer will play..."
     sleep(3)
     loop do
-      if dealer.total < 17
-        card = @deck.deal_one
-        dealer.cards << card
-        puts "Dealer now has : #{dealer.cards}"
-      else
-        break
-      end
+      break unless dealer.total < 17
+      card = @deck.deal_one
+      dealer.cards << card
+      puts "Dealer now has : #{dealer.cards}"
     end
   end
 end
