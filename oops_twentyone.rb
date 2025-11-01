@@ -1,10 +1,15 @@
+CARD_VALUES = {
+  ace: 11, two: 2, three: 3, four: 4, five: 5, six: 6,
+  seven: 7, eight: 8, nine: 9, ten: 10, jack: 10, queen: 10, king: 10
+}
+
 module Hand
   def busted?
     total > 21
   end
 
   def total
-    total_sum = cards.sum { |card| Card::CARD_VALUES[card] }
+    total_sum = cards.sum { |card| CARD_VALUES[card] }
 
     if ace_count >= 1
       ace_count.times do |_|
@@ -64,25 +69,14 @@ class Deck
     end
   end
 
+  def available_cards
+    deck.select { |_, count| count > 0 }.keys
+  end
+
   def deal_one
-    card = deck.keys.sample
+    card = available_cards.sample
     update_deck(card)
     card
-  end
-end
-
-class Card
-  CARD_VALUES = {
-    ace: 11, two: 2, three: 3, four: 4, five: 5, six: 6,
-    seven: 7, eight: 8, nine: 9, ten: 10, jack: 10, queen: 10, king: 10
-  }
-
-  def initialize
-    @value = card_value?
-  end
-
-  def card_value?(card)
-    CARD_VALUES[card]
   end
 end
 
@@ -114,6 +108,14 @@ class Game
     end
   end
 
+  def display_hands
+    puts "Final Hands: "
+    puts "Dealer has : #{dealer.cards}"
+    puts "Dealer total = #{dealer.total}"
+    puts "Player has : #{player.cards}"
+    puts "Player total = #{player.total}"
+  end
+
   def show_result
     puts "==============================="
     if player.busted?
@@ -122,11 +124,7 @@ class Game
       puts "Dealer busted! Player wins!"
     else
       who_won?
-      puts "Final Hands: "
-      puts "Dealer has : #{dealer.cards}"
-      puts "Dealer total = #{dealer.total}"
-      puts "Player has : #{player.cards}"
-      puts "Player total = #{player.total}"
+      display_hands
     end
     puts "====== Game Over =============="
   end
@@ -147,23 +145,38 @@ class Game
     puts "--------------------------"
   end
 
-  def player_turn
+  def player_hits
+    card = @deck.deal_one
+    player.cards << card
+    puts "Player now has : #{player.cards}"
+  end
+
+  def player_choice
+    answer = nil
     loop do
       puts "Do you want to hit(h) or stay(s)?"
-      choice = gets.chomp
+      answer = gets.chomp.downcase
+      break if ['h', 's'].include?(answer)
+      puts "Not a valid choice press h or s only"
+    end
+    answer
+  end
 
-      case choice
-      when "h"
-        card = @deck.deal_one
-        player.cards << card
-        puts "Player now has : #{player.cards}"
-      when "s"
-        puts "You chose to stay!"
-        puts "--------------------------"
+  def player_stays
+    puts "You chose to stay!"
+    puts "--------------------------"
+  end
+
+  def player_turn
+    loop do
+      choice = player_choice
+
+      if choice == "s"
+        player_stays
         break
-      else
-        puts "Not a valid choice press h or s only"
       end
+
+      player_hits
       break if player.busted?
     end
   end
