@@ -11,12 +11,11 @@ module Hand
   def total
     total_sum = cards.sum { |card| CARD_VALUES[card] }
 
-    if ace_count >= 1
-      ace_count.times do |_|
-        break if total_sum <= 21
-        total_sum -= 10
-      end
+    ace_count.times do |_|
+      break if total_sum <= 21
+      total_sum -= 10
     end
+
     total_sum
   end
 
@@ -81,14 +80,6 @@ class Deck
 end
 
 class Game
-  def initialize
-    @deck = Deck.new
-    @player = Player.new(player_name)
-    @dealer = Dealer.new
-  end
-
-  attr_accessor :player, :dealer, :deck
-
   def start
     deal_cards
     show_initial_cards
@@ -96,6 +87,16 @@ class Game
     dealer_turn if !player.busted?
     show_result
   end
+
+  private
+
+  def initialize
+    @deck = Deck.new
+    @player = Player.new(player_name)
+    @dealer = Dealer.new
+  end
+
+  attr_accessor :player, :dealer, :deck
 
   def who_won?
     case dealer.total <=> player.total
@@ -116,6 +117,12 @@ class Game
     puts "Player total = #{player.total}"
   end
 
+  def show_initial_cards
+    puts "#{player.name} got: #{player.cards.join(' and  ')}"
+    puts "Dealer got: #{dealer.cards.first}"
+    puts "--------------------------"
+  end
+
   def show_result
     puts "==============================="
     if player.busted?
@@ -124,8 +131,9 @@ class Game
       puts "Dealer busted! Player wins!"
     else
       who_won?
-      display_hands
     end
+    puts "==============================="
+    display_hands
     puts "====== Game Over =============="
   end
 
@@ -135,14 +143,14 @@ class Game
   end
 
   def player_name
-    puts "Who is playing today?"
-    gets.chomp
-  end
-
-  def show_initial_cards
-    puts "#{player.name} got: #{player.cards.join(' and  ')}"
-    puts "Dealer got: #{dealer.cards.first}"
-    puts "--------------------------"
+    name = ""
+    loop do
+      puts "Who is playing today?"
+      name = gets.chomp
+      break if !name.empty?
+      puts "Please enter a valid name"
+    end
+    name
   end
 
   def player_hits
@@ -162,7 +170,7 @@ class Game
     answer
   end
 
-  def player_stays
+  def display_stay_message
     puts "You chose to stay!"
     puts "--------------------------"
   end
@@ -172,7 +180,7 @@ class Game
       choice = player_choice
 
       if choice == "s"
-        player_stays
+        display_stay_message
         break
       end
 
